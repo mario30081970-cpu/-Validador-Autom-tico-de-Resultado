@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Validador Automático · Planilla de Referencias (Excel)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #eef2f7;
+      margin: 0;
+      padding: 24px 20px;
+      color: #0b2b3b;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1f5e7e, #0f3b4f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+    }
+    .subtitulo {
+      border-left: 5px solid #2c7da0;
+      padding-left: 18px;
+      margin: 8px 0 24px 0;
+      color: #2c5a6e;
+      font-weight: 500;
+    }
+    .card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+      margin-bottom: 38px;
+      overflow-x: auto;
+      border: 1px solid #dce5ec;
+    }
+    .card-header {
+      background: #f9fcff;
+      padding: 18px 24px;
+      border-bottom: 2px solid #e2edf2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .card-header h2 {
+      margin: 0;
+      font-weight: 650;
+      font-size: 1.45rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-op {
+      background: #1e566e;
+      color: white;
+      font-weight: bold;
+      font-size: 0.85rem;
+      padding: 4px 12px;
+      border-radius: 40px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: white;
+      border: 1px solid #cbdae9;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.85rem;
+      color: #1f4e6e;
+    }
+    button.primary {
+      background: #1f5e7e;
+      border-color: #1f5e7e;
+      color: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    button.primary:hover {
+      background: #0e445f;
+      transform: translateY(-1px);
+    }
+    button:hover {
+      background: #e6f0f9;
+      border-color: #8ba9c2;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      background: #f0f6fa;
+      padding: 14px 10px;
+      text-align: center;
+      font-weight: 700;
+      color: #0b4a65;
+      border-bottom: 1px solid #cbdae9;
+    }
+    td {
+      padding: 12px 6px;
+      text-align: center;
+      border-bottom: 1px solid #e6edf2;
+      vertical-align: middle;
+    }
+    .dato-fijo {
+      font-weight: 600;
+      background-color: #fef7e0;
+      font-family: monospace;
+    }
+    input {
+      width: 135px;
+      padding: 8px 8px;
+      text-align: center;
+      border: 1px solid #cbdae9;
+      border-radius: 24px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: white;
+      transition: 0.1s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2c7da0;
+      box-shadow: 0 0 0 2px rgba(44,125,160,0.2);
+    }
+    .estado {
+      font-weight: 600;
+      min-width: 100px;
+      text-align: center;
+    }
+    .correcto {
+      color: #0f6e3f;
+      background: #dff9e6;
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+    .incorrecto {
+      color: #b91c1c;
+      background: #ffe6e5;
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      display: inline-block;
+    }
+    .mensaje-resumen {
+      background: #eaf4fc;
+      padding: 12px 20px;
+      border-radius: 32px;
+      font-weight: 500;
+      margin: 12px 20px 20px 20px;
+      text-align: center;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.75rem;
+      color: #6082a0;
+      border-top: 1px solid #cde0ec;
+      padding-top: 24px;
+    }
+    .badge-moneda {
+      font-family: monospace;
+      font-weight: 600;
+    }
+    .nota-extra {
+      background: #fef7dd;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      margin: 10px 20px;
+      text-align: center;
+    }
+    @media (max-width: 780px) {
+      td, th { padding: 8px 3px; }
+      input { width: 100px; font-size: 0.7rem; }
+      .card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 Validador Automático de Resultados</h1>
+  <div class="subtitulo">✅ Actividad "Planilla Referencias.pdf" · Cálculos con referencias en Excel (descuentos, aumento 15%, conversión de monedas)</div>
+  <p style="margin-bottom: 20px;">✏️ Ingresa tus resultados en cada campo. El sistema los compara con los valores exactos según las fórmulas de la planilla. <br>📌 <strong>Tolerancia:</strong> ±0.01 para valores monetarios, ±1 para conversiones grandes.</p>
+
+  <!-- ===================== SECCIÓN 1: DESCUENTOS Y AHORRO ===================== -->
+  <div class="card">
+    <div class="card-header">
+      <h2><span class="badge-op">💰 DESCUENTOS + AHORRO</span> Salud 4% · Pensión 4% · Sindicato 2% · Seg. Vida 1% · Ahorro 10%</h2>
+      <div class="btn-group">
+        <button class="validar-seccion" data-seccion="descuentos">✔️ Validar sección</button>
+        <button class="rellenar-seccion" data-seccion="descuentos">📥 Mostrar respuestas correctas</button>
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <table id="tabla-descuentos">
+        <thead>
+          <tr><th>Empleado</th><th>Sueldo Bruto ($)</th><th>Total Descuentos ($)<br>(Salud+Pensión+Sind+SegVida)</th><th>Monto a ahorrar ($)<br>10% del sueldo</th><th>Neto a Cobrar ($)</th><th>Estado</th></tr>
+        </thead>
+        <tbody id="tbody-descuentos"></tbody>
+      </table>
+    </div>
+    <div class="mensaje-resumen" id="resumen-descuentos"></div>
+    <div class="nota-extra">📌 Los descuentos se calculan sobre el sueldo: Salud=4%, Pensión=4%, Sindicato=2%, Seguro Vida=1% → Total descuentos = 11% del sueldo. Ahorro = 10% extra. Neto = Sueldo - Total Descuentos - Monto a ahorrar.</div>
+  </div>
+
+  <!-- ===================== SECCIÓN 2: AUMENTO DEL 15% ===================== -->
+  <div class="card">
+    <div class="card-header">
+      <h2><span class="badge-op">📈 AUMENTO 15%</span> Incremento salarial · Nuevo sueldo</h2>
+      <div class="btn-group">
+        <button class="validar-seccion" data-seccion="aumento">✔️ Validar sección</button>
+        <button class="rellenar-seccion" data-seccion="aumento">📥 Mostrar respuestas correctas</button>
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <table id="tabla-aumento">
+        <thead>
+          <tr><th>Empleado</th><th>Salario Base ($)</th><th>Aumento (15%) ($)</th><th>Nuevo Salario ($)</th><th>Estado</th></tr>
+        </thead>
+        <tbody id="tbody-aumento"></tbody>
+      </table>
+    </div>
+    <div class="mensaje-resumen" id="resumen-aumento"></div>
+    <div class="nota-extra">🔹 Aumento = Salario Base × 0.15   ·   Nuevo Salario = Salario Base × 1.15</div>
+  </div>
+
+  <!-- ===================== SECCIÓN 3: CONVERSIÓN DE MONEDAS ===================== -->
+  <div class="card">
+    <div class="card-header">
+      <h2><span class="badge-op">💱 CONVERSIÓN DE MONEDAS</span> Pesos Argentinos → Dólar / Euro / Libra / Yen / Franco Suizo</h2>
+      <div class="btn-group">
+        <button class="validar-seccion" data-seccion="conversion">✔️ Validar sección</button>
+        <button class="rellenar-seccion" data-seccion="conversion">📥 Mostrar respuestas correctas</button>
+      </div>
+    </div>
+    <div style="overflow-x: auto;">
+      <table id="tabla-conversion">
+        <thead>
+          <tr><th>Monto en Pesos Argentinos</th><th>Dólar (USD)<br>1 USD = 850 ARS</th><th>Euro (EUR)<br>1 EUR = 923 ARS</th><th>Libra (GBP)<br>1 GBP = 1.081 ARS*</th><th>Yen (JPY)<br>1 JPY = 563 ARS</th><th>Franco Suizo (CHF)<br>1 CHF = 95.692 ARS*</th><th>Estado General</th></tr>
+        </thead>
+        <tbody id="tbody-conversion"></tbody>
+      </table>
+    </div>
+    <div class="mensaje-resumen" id="resumen-conversion"></div>
+    <div class="nota-extra">⚠️ *Atención: la tabla del PDF muestra "Libra Británica 1,081" (probablemente 1081 ARS por libra) y "Franco Suizo 95,692" (95692 ARS por franco). Se respetan esos valores. Conversión = Monto ARS / Valor moneda.</div>
+  </div>
+
+  <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0 10px;">
+    <button id="validarTodoBtn" class="primary" style="padding: 10px 32px;">✅ VALIDAR TODO</button>
+    <button id="limpiarTodoBtn" style="padding: 10px 28px;">🧹 Limpiar todos los campos</button>
+  </div>
+  <footer>
+    Validador basado en los datos de "Planilla Referencias.pdf" (páginas 1, 2 y 4). <br>
+    Para la sección de Horas (Diurna/Extra) no hay datos suficientes, solo se validan las partes completas: descuentos, aumento 15% y conversión de monedas.
+  </footer>
+</div>
+
+<script>
+  // --------------------------------------------------------------
+  // DATOS EXTRAÍDOS EXACTAMENTE DEL PDF "Planilla Referencias.pdf"
+  // --------------------------------------------------------------
+
+  // 1. Empleados para DESCUENTOS (página 1)
+  const empleadosDescuentos = [
+    { nombre: "Cardone", sueldo: 1470000 },
+    { nombre: "Méndez", sueldo: 1248800 },
+    { nombre: "Mansilla", sueldo: 1117200 },
+    { nombre: "Benítez", sueldo: 1290800 },
+    { nombre: "Mendieta", sueldo: 905000 },
+    { nombre: "Arriola", sueldo: 851200 },
+    { nombre: "Bascur", sueldo: 1052800 },
+    { nombre: "Rodríguez", sueldo: 859600 },
+    { nombre: "Pérez", sueldo: 1078000 },
+    { nombre: "Beltrán", sueldo: 1226400 },
+    { nombre: "González", sueldo: 1220800 }
+  ];
+
+  // Porcentajes fijos
+  const PCT_SALUD = 0.04;
+  const PCT_PENSION = 0.04;
+  const PCT_SINDICATO = 0.02;
+  const PCT_SEGURO = 0.01;
+  const PCT_AHORRO = 0.10;
+  // Total descuentos = 11% (0.04+0.04+0.02+0.01)
+  const TOTAL_DESCUENTOS_PCT = PCT_SALUD + PCT_PENSION + PCT_SINDICATO + PCT_SEGURO; // 0.11
+
+  function calcularTotalDescuentos(sueldo) {
+    return sueldo * TOTAL_DESCUENTOS_PCT;
+  }
+  function calcularMontoAhorro(sueldo) {
+    return sueldo * PCT_AHORRO;
+  }
+  function calcularNetoCobrar(sueldo) {
+    return sueldo - calcularTotalDescuentos(sueldo) - calcularMontoAhorro(sueldo);
+  }
+
+  // 2. Empleados para AUMENTO (página 2)
+  const empleadosAumento = [
+    { nombre: "ABDALA JUAN", salario: 350000 },
+    { nombre: "ACEVEDO SEBASTIÁN", salario: 600000 },
+    { nombre: "ACEVEDO YESSICA", salario: 550000 },
+    { nombre: "AGUDELO ANDRÉS", salario: 600000 },
+    { nombre: "AQUIRRE JOHANA M.", salario: 450000 },
+    { nombre: "ANGULO DAVID", salario: 600000 },
+    { nombre: "ANGLULO MARÍA", salario: 350000 },
+    { nombre: "BEDOYA KELLY", salario: 450000 },
+    { nombre: "BEDOYA YURANY ANA", salario: 450000 },
+    { nombre: "CARDONA ALEJANDRA", salario: 450000 },
+    { nombre: "CARDONA ANA MARÍA", salario: 600000 },
+    { nombre: "CASAS FRANCO LINA", salario: 350000 },
+    { nombre: "CASTRO CARO JULIETH", salario: 550000 },
+    { nombre: "CORTÉS LUISA", salario: 350000 },
+    { nombre: "CORTÍNEZ AURA", salario: 600000 }
+  ];
+  const PCT_AUMENTO = 0.15;
+
+  function calcularAumento(salario) {
+    return salario * PCT_AUMENTO;
+  }
+  function calcularNuevoSalario(salario) {
+    return salario * (1 + PCT_AUMENTO);
+  }
+
+  // 3. Datos para CONVERSIÓN DE MONEDAS (página 4)
+  // Valores de cada moneda en pesos argentinos
+  const tasas = {
+    dolar: 850,      // 1 USD = 850 ARS
+    euro: 923,       // 1 EUR = 923 ARS
+    libra: 1081,     // 1 GBP = 1081 ARS (dato PDF: 1,081)
+    yen: 563,        // 1 JPY = 563 ARS
+    franco: 95692    // 1 CHF = 95,692 ARS (dato PDF: 95,692)
+  };
+  // Montos a convertir (en Pesos Argentinos)
+  const montosARS = [15800000, 10850000, 8325000, 5400000, 23255000];
+
+  function convertirMoneda(montoARS, tasa) {
+    return montoARS / tasa;
+  }
+
+  // --------------------------------------------------------------
+  // RENDERIZADO DE TABLAS
+  // --------------------------------------------------------------
+  function renderDescuentos() {
+    const tbody = document.getElementById('tbody-descuentos');
+    tbody.innerHTML = '';
+    empleadosDescuentos.forEach((emp, idx) => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = emp.nombre;
+      row.insertCell(1).innerHTML = `<span class="dato-fijo">$${emp.sueldo.toLocaleString()}</span>`;
+      // inputs para Total Descuentos, Monto ahorrar, Neto
+      row.insertCell(2).innerHTML = `<input type="number" step="any" id="desc_total_${idx}" placeholder="Total descuentos">`;
+      row.insertCell(3).innerHTML = `<input type="number" step="any" id="desc_ahorro_${idx}" placeholder="Monto ahorro">`;
+      row.insertCell(4).innerHTML = `<input type="number" step="any" id="desc_neto_${idx}" placeholder="Neto a cobrar">`;
+      row.insertCell(5).innerHTML = `<span id="desc_status_${idx}" class="estado">⚪</span>`;
+    });
+  }
+
+  function renderAumento() {
+    const tbody = document.getElementById('tbody-aumento');
+    tbody.innerHTML = '';
+    empleadosAumento.forEach((emp, idx) => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = emp.nombre;
+      row.insertCell(1).innerHTML = `<span class="dato-fijo">$${emp.salario.toLocaleString()}</span>`;
+      row.insertCell(2).innerHTML = `<input type="number" step="any" id="aum_monto_${idx}" placeholder="Aumento 15%">`;
+      row.insertCell(3).innerHTML = `<input type="number" step="any" id="aum_nuevo_${idx}" placeholder="Nuevo salario">`;
+      row.insertCell(4).innerHTML = `<span id="aum_status_${idx}" class="estado">⚪</span>`;
+    });
+  }
+
+  function renderConversion() {
+    const tbody = document.getElementById('tbody-conversion');
+    tbody.innerHTML = '';
+    montosARS.forEach((monto, idx) => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerHTML = `<strong>$${monto.toLocaleString()} ARS</strong>`;
+      // inputs para cada moneda
+      row.insertCell(1).innerHTML = `<input type="number" step="any" id="conv_usd_${idx}" placeholder="USD">`;
+      row.insertCell(2).innerHTML = `<input type="number" step="any" id="conv_eur_${idx}" placeholder="EUR">`;
+      row.insertCell(3).innerHTML = `<input type="number" step="any" id="conv_gbp_${idx}" placeholder="GBP">`;
+      row.insertCell(4).innerHTML = `<input type="number" step="any" id="conv_jpy_${idx}" placeholder="JPY">`;
+      row.insertCell(5).innerHTML = `<input type="number" step="any" id="conv_chf_${idx}" placeholder="CHF">`;
+      row.insertCell(6).innerHTML = `<span id="conv_status_${idx}" class="estado">⚪</span>`;
+    });
+  }
+
+  // --------------------------------------------------------------
+  // VALIDACIONES (tolerancia)
+  // --------------------------------------------------------------
+  function casiIgual(valCorrecto, valUsuario, tolerancia = 0.01) {
+    if (isNaN(valUsuario)) return false;
+    return Math.abs(valCorrecto - valUsuario) <= tolerancia;
+  }
+
+  // VALIDAR DESCUENTOS (fila)
+  function validarFilaDescuentos(idx) {
+    const sueldo = empleadosDescuentos[idx].sueldo;
+    const descCorrecto = calcularTotalDescuentos(sueldo);
+    const ahorroCorrecto = calcularMontoAhorro(sueldo);
+    const netoCorrecto = calcularNetoCobrar(sueldo);
+
+    const inputDesc = document.getElementById(`desc_total_${idx}`);
+    const inputAhorro = document.getElementById(`desc_ahorro_${idx}`);
+    const inputNeto = document.getElementById(`desc_neto_${idx}`);
+    if (!inputDesc || !inputAhorro || !inputNeto) return false;
+
+    const userDesc = parseFloat(inputDesc.value);
+    const userAhorro = parseFloat(inputAhorro.value);
+    const userNeto = parseFloat(inputNeto.value);
+
+    const okDesc = casiIgual(descCorrecto, userDesc);
+    const okAhorro = casiIgual(ahorroCorrecto, userAhorro);
+    const okNeto = casiIgual(netoCorrecto, userNeto);
+
+    const statusSpan = document.getElementById(`desc_status_${idx}`);
+    if (okDesc && okAhorro && okNeto) {
+      statusSpan.innerHTML = '<span class="correcto">✓ Correcto</span>';
+      return true;
+    } else {
+      let errorMsg = '';
+      if (!okDesc) errorMsg += `Desc: $${descCorrecto.toFixed(2)} `;
+      if (!okAhorro) errorMsg += `Ahorro: $${ahorroCorrecto.toFixed(2)} `;
+      if (!okNeto) errorMsg += `Neto: $${netoCorrecto.toFixed(2)}`;
+      statusSpan.innerHTML = `<span class="incorrecto">✗ ${errorMsg}</span>`;
+      return false;
+    }
+  }
+
+  // VALIDAR AUMENTO (fila)
+  function validarFilaAumento(idx) {
+    const salarioBase = empleadosAumento[idx].salario;
+    const aumentoCorrecto = calcularAumento(salarioBase);
+    const nuevoCorrecto = calcularNuevoSalario(salarioBase);
+
+    const inputAum = document.getElementById(`aum_monto_${idx}`);
+    const inputNuevo = document.getElementById(`aum_nuevo_${idx}`);
+    if (!inputAum || !inputNuevo) return false;
+
+    const userAum = parseFloat(inputAum.value);
+    const userNuevo = parseFloat(inputNuevo.value);
+
+    const okAum = casiIgual(aumentoCorrecto, userAum);
+    const okNuevo = casiIgual(nuevoCorrecto, userNuevo);
+    const statusSpan = document.getElementById(`aum_status_${idx}`);
+    if (okAum && okNuevo) {
+      statusSpan.innerHTML = '<span class="correcto">✓ Correcto</span>';
+      return true;
+    } else {
+      let err = '';
+      if (!okAum) err += `Aumento: $${aumentoCorrecto.toFixed(2)} `;
+      if (!okNuevo) err += `Nuevo: $${nuevoCorrecto.toFixed(2)}`;
+      statusSpan.innerHTML = `<span class="incorrecto">✗ ${err}</span>`;
+      return false;
+    }
+  }
+
+  // VALIDAR CONVERSIÓN (fila por monto)
+  function validarFilaConversion(idx) {
+    const monto = montosARS[idx];
+    const usdCorrecto = convertirMoneda(monto, tasas.dolar);
+    const eurCorrecto = convertirMoneda(monto, tasas.euro);
+    const gbpCorrecto = convertirMoneda(monto, tasas.libra);
+    const jpyCorrecto = convertirMoneda(monto, tasas.yen);
+    const chfCorrecto = convertirMoneda(monto, tasas.franco);
+
+    const usdInput = document.getElementById(`conv_usd_${idx}`);
+    const eurInput = document.getElementById(`conv_eur_${idx}`);
+    const gbpInput = document.getElementById(`conv_gbp_${idx}`);
+    const jpyInput = document.getElementById(`conv_jpy_${idx}`);
+    const chfInput = document.getElementById(`conv_chf_${idx}`);
+    if (!usdInput || !eurInput || !gbpInput || !jpyInput || !chfInput) return false;
+
+    const userUSD = parseFloat(usdInput.value);
+    const userEUR = parseFloat(eurInput.value);
+    const userGBP = parseFloat(gbpInput.value);
+    const userJPY = parseFloat(jpyInput.value);
+    const userCHF = parseFloat(chfInput.value);
+
+    const okUSD = casiIgual(usdCorrecto, userUSD, 0.5);
+    const okEUR = casiIgual(eurCorrecto, userEUR, 0.5);
+    const okGBP = casiIgual(gbpCorrecto, userGBP, 0.5);
+    const okJPY = casiIgual(jpyCorrecto, userJPY, 0.5);
+    const okCHF = casiIgual(chfCorrecto, userCHF, 0.5);
+
+    const statusSpan = document.getElementById(`conv_status_${idx}`);
+    if (okUSD && okEUR && okGBP && okJPY && okCHF) {
+      statusSpan.innerHTML = '<span class="correcto">✓ Todas correctas</span>';
+      return true;
+    } else {
+      let errores = [];
+      if (!okUSD) errores.push(`USD≈${usdCorrecto.toFixed(2)}`);
+      if (!okEUR) errores.push(`EUR≈${eurCorrecto.toFixed(2)}`);
+      if (!okGBP) errores.push(`GBP≈${gbpCorrecto.toFixed(2)}`);
+      if (!okJPY) errores.push(`JPY≈${jpyCorrecto.toFixed(2)}`);
+      if (!okCHF) errores.push(`CHF≈${chfCorrecto.toFixed(2)}`);
+      statusSpan.innerHTML = `<span class="incorrecto">✗ ${errores.join(', ')}</span>`;
+      return false;
+    }
+  }
+
+  // VALIDAR SECCIONES COMPLETAS
+  function validarSeccion(seccion) {
+    if (seccion === 'descuentos') {
+      let aciertos = 0;
+      for (let i = 0; i < empleadosDescuentos.length; i++) {
+        if (validarFilaDescuentos(i)) aciertos++;
+      }
+      const resumen = document.getElementById('resumen-descuentos');
+      resumen.innerText = `📊 Resultados: ${aciertos}/${empleadosDescuentos.length} empleados con todos sus campos correctos.`;
+    } else if (seccion === 'aumento') {
+      let aciertos = 0;
+      for (let i = 0; i < empleadosAumento.length; i++) {
+        if (validarFilaAumento(i)) aciertos++;
+      }
+      document.getElementById('resumen-aumento').innerText = `📈 Resultados: ${aciertos}/${empleadosAumento.length} empleados con aumento y nuevo salario correctos.`;
+    } else if (seccion === 'conversion') {
+      let aciertos = 0;
+      for (let i = 0; i < montosARS.length; i++) {
+        if (validarFilaConversion(i)) aciertos++;
+      }
+      document.getElementById('resumen-conversion').innerText = `💱 Conversiones: ${aciertos}/${montosARS.length} filas completamente correctas.`;
+    }
+  }
+
+  // RELLENAR RESPUESTAS CORRECTAS (mostrar soluciones)
+  function rellenarSeccion(seccion) {
+    if (seccion === 'descuentos') {
+      empleadosDescuentos.forEach((emp, idx) => {
+        const sueldo = emp.sueldo;
+        const desc = calcularTotalDescuentos(sueldo);
+        const ahorro = calcularMontoAhorro(sueldo);
+        const neto = calcularNetoCobrar(sueldo);
+        const inputDesc = document.getElementById(`desc_total_${idx}`);
+        const inputAhorro = document.getElementById(`desc_ahorro_${idx}`);
+        const inputNeto = document.getElementById(`desc_neto_${idx}`);
+        if (inputDesc) inputDesc.value = desc.toFixed(2);
+        if (inputAhorro) inputAhorro.value = ahorro.toFixed(2);
+        if (inputNeto) inputNeto.value = neto.toFixed(2);
+        validarFilaDescuentos(idx);
+      });
+      validarSeccion('descuentos');
+    } else if (seccion === 'aumento') {
+      empleadosAumento.forEach((emp, idx) => {
+        const aumento = calcularAumento(emp.salario);
+        const nuevo = calcularNuevoSalario(emp.salario);
+        const inputAum = document.getElementById(`aum_monto_${idx}`);
+        const inputNuevo = document.getElementById(`aum_nuevo_${idx}`);
+        if (inputAum) inputAum.value = aumento.toFixed(2);
+        if (inputNuevo) inputNuevo.value = nuevo.toFixed(2);
+        validarFilaAumento(idx);
+      });
+      validarSeccion('aumento');
+    } else if (seccion === 'conversion') {
+      montosARS.forEach((monto, idx) => {
+        const usd = convertirMoneda(monto, tasas.dolar);
+        const eur = convertirMoneda(monto, tasas.euro);
+        const gbp = convertirMoneda(monto, tasas.libra);
+        const jpy = convertirMoneda(monto, tasas.yen);
+        const chf = convertirMoneda(monto, tasas.franco);
+        const usdInp = document.getElementById(`conv_usd_${idx}`);
+        const eurInp = document.getElementById(`conv_eur_${idx}`);
+        const gbpInp = document.getElementById(`conv_gbp_${idx}`);
+        const jpyInp = document.getElementById(`conv_jpy_${idx}`);
+        const chfInp = document.getElementById(`conv_chf_${idx}`);
+        if (usdInp) usdInp.value = usd.toFixed(2);
+        if (eurInp) eurInp.value = eur.toFixed(2);
+        if (gbpInp) gbpInp.value = gbp.toFixed(2);
+        if (jpyInp) jpyInp.value = jpy.toFixed(2);
+        if (chfInp) chfInp.value = chf.toFixed(2);
+        validarFilaConversion(idx);
+      });
+      validarSeccion('conversion');
+    }
+  }
+
+  function limpiarTodo() {
+    const allInputs = document.querySelectorAll('input[type="number"]');
+    allInputs.forEach(inp => inp.value = '');
+    const allStatus = document.querySelectorAll('.estado');
+    allStatus.forEach(span => span.innerHTML = '⚪');
+    document.getElementById('resumen-descuentos').innerText = '';
+    document.getElementById('resumen-aumento').innerText = '';
+    document.getElementById('resumen-conversion').innerText = '';
+  }
+
+  function validarTodo() {
+    validarSeccion('descuentos');
+    validarSeccion('aumento');
+    validarSeccion('conversion');
+  }
+
+  // EVENTOS Y RENDER INICIAL
+  document.addEventListener('DOMContentLoaded', () => {
+    renderDescuentos();
+    renderAumento();
+    renderConversion();
+
+    document.querySelectorAll('.validar-seccion').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const sec = btn.getAttribute('data-seccion');
+        validarSeccion(sec);
+      });
+    });
+    document.querySelectorAll('.rellenar-seccion').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const sec = btn.getAttribute('data-seccion');
+        rellenarSeccion(sec);
+      });
+    });
+    document.getElementById('validarTodoBtn').addEventListener('click', validarTodo);
+    document.getElementById('limpiarTodoBtn').addEventListener('click', limpiarTodo);
+  });
+</script>
+</body>
+</html>
